@@ -103,7 +103,7 @@ if __name__ == '__main__':
     # Compare
     dup_fnames = utils.get_duplicates(embeds, img_paths, dist_threshold, emb_dtype)
     
-    print('\n\nResults:')
+    print('\n\nResults:\n')
     for k, v in dup_fnames.iteritems():
         for img in v:
             try:
@@ -111,6 +111,6 @@ if __name__ == '__main__':
                 print(k, img)
             except IOError:
                 print('error {} {}'.format(k, img))
-    print('INFO: Duplicate detection completed.')
+    print('\nINFO: Duplicate detection completed.')
     print('============================================================\n')
     
