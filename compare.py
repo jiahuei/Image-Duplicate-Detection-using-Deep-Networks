@@ -58,6 +58,7 @@ if __name__ == '__main__':
     recursive_list = args.recursive_scan
     cache_resized_img = args.cache_resized_img
     gpu_id = str(args.gpu_id)
+    print('INFO: Using GPU #{}.'.format(gpu_id))
     
     dist_threshold = args.difference_threshold
     if dist_threshold < 1 or dist_threshold > 100:
@@ -78,10 +79,11 @@ if __name__ == '__main__':
     os.environ['CUDA_VISIBLE_DEVICES'] = gpu_id
     network = net_params.get_net_params(net_name)
     
-    if in_size < 50:
+    if in_size < network['default_input_size'] or in_size > 1024:
         print('INFO: Using the default input size for `{}`.'.format(
                                                             network['name']))
         in_size = network['default_input_size']
+    
     cname = '{}_@_{}_@_{}'.format(network['name'], network['end_point'], in_size)
     print('INFO: Using `{}` for duplicate detection.'.format(cname))
     time.sleep(0.1)
@@ -91,7 +93,7 @@ if __name__ == '__main__':
     img_paths = utils.list_files(dirs, recursive_list)
     print('INFO: Found {:,d} images.'.format(len(img_paths)))
     time.sleep(0.2)
-    raise SystemExit
+    
     # Read and resize the images
     imgs = [utils.read_resize(f, in_size, cache_resized_img) for f in tqdm(img_paths)]
     
@@ -101,7 +103,7 @@ if __name__ == '__main__':
     # Compare
     dup_fnames = utils.get_duplicates(embeds, img_paths, dist_threshold, emb_dtype)
     
-    
+    print('\n\nResults:')
     for k, v in dup_fnames.iteritems():
         for img in v:
             try:

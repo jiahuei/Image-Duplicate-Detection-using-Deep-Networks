@@ -7,6 +7,10 @@ Created on Wed Jan  9 23:21:36 2019
 Network parameters, preprocessing functions, etc.
 
 """
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import tensorflow as tf
 import numpy as np
 import os

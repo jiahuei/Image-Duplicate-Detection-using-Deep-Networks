@@ -7,6 +7,10 @@ Created on Wed Jan  9 23:38:59 2019
 Utility functions.
 
 """
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import os, math, time, re, requests, tarfile
 import numpy as np
 import tensorflow as tf
@@ -107,14 +111,22 @@ def list_files(dirs, recursive_list=False):
             return natsorted(l, alg=ns.IGNORECASE)
         else:
             return sorted(l, key=_natural_keys)
+    skip = ['/', '\\', 'C:\\']
+    def _skip(d):
+        if d in skip or not os.path.isdir(d):
+            print('INFO: Directory `{}` skipped.'.format(d))
+            return True
+        return False
     file_paths = []
     if recursive_list:
         for rootdir in dirs:
+            if _skip(rootdir): continue
             for root, subdirs, files in os.walk(rootdir):
                 print('INFO: Reading directory: {}'.format(root))
                 file_paths += [pjoin(root, f) for f in  _sort(files)]
     else:
         for rootdir in dirs:
+            if _skip(rootdir): continue
             print('INFO: Reading directory: {}'.format(rootdir))
             for f in _sort(os.listdir(rootdir)):
                 file_paths.append(pjoin(rootdir, f))
@@ -148,18 +160,18 @@ def read_resize(img_path, short_side_len, save_resized_imgs=True):
         img = img.resize(new_size, Image.BILINEAR)
     
     img_arr = np.array(img)
-    err_mssg = 'Corrupted or unsupported image file.'
+    err_mssg = 'Corrupted or unsupported image file: `{}`.'
     if len(img_arr.shape) == 3:
         if img_arr.shape[-1] == 3:
             pass
         elif img_arr.shape[-1] == 1:
             img_arr = np.concatenate([img_arr] * 3, axis=2)
         else:
-            raise ValueError(err_mssg)
+            raise ValueError(err_mssg.format(img_path))
     elif len(img_arr.shape) == 2:
         img_arr = np.stack([img_arr] * 3, axis=2)
     else:
-        raise ValueError(err_mssg)
+        raise ValueError(err_mssg.format(img_path))
     if save_resized_imgs and not resize_img_exists:
         if not os.path.exists(img_dir_new):
             os.makedirs(img_dir_new)
@@ -247,11 +259,12 @@ def get_duplicates(embeds, fnames, dist_threshold, dtype=np.float16):
         prb_embeds = np.expand_dims(embeds, axis=1)
         gal_embeds = np.expand_dims(embeds, axis=0)
         diff = prb_embeds - gal_embeds
+        diff = diff.astype(dtype)
         np.square(diff, out=diff)
         dist = np.sqrt(np.sum(diff, axis=2))
         mask = np.tril(np.ones_like(dist), k=0)
+        dist += mask
         duplicates = dist < dist_threshold
-        duplicates = duplicates.astype(dtype) * mask
         for i in range(num_imgs):
             dups = np.nonzero(duplicates[i, :])[0]
             if len(dups) == 0:
