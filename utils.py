@@ -187,7 +187,7 @@ def read_resize(img_path, short_side_len, save_resized_imgs=True):
     elif len(img_arr.shape) == 2:
         img_arr = np.stack([img_arr] * 3, axis=2)
     else:
-        img = _try_convert(img)
+        img_arr = _try_convert(img)
     if save_resized_imgs and not resize_img_exists:
         if not os.path.exists(img_dir_new):
             os.makedirs(img_dir_new)
