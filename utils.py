@@ -159,19 +159,35 @@ def read_resize(img_path, short_side_len, save_resized_imgs=True):
         new_size = [int(img.size[i] * ratio) for i in range(2)]
         img = img.resize(new_size, Image.BILINEAR)
     
+    def _try_convert(image):
+        try:
+            image = image.convert(mode='RGB')
+            return np.array(image)
+        except:
+            raise ValueError(err_mssg.format(img_path))
+    
     img_arr = np.array(img)
     err_mssg = 'Corrupted or unsupported image file: `{}`.'
-    if len(img_arr.shape) == 3:
+    if len(img_arr.shape) == 4:
+        if img.mode == 'RGBA':
+            png = img.copy()
+            png.load() # required for png.split()
+            img = Image.new("RGB", png.size, (255, 255, 255))
+            img.paste(png, mask=png.split()[3])
+            img_arr = np.array(img)
+        else:
+            img_arr = _try_convert(img)
+    elif len(img_arr.shape) == 3:
         if img_arr.shape[-1] == 3:
             pass
         elif img_arr.shape[-1] == 1:
             img_arr = np.concatenate([img_arr] * 3, axis=2)
         else:
-            raise ValueError(err_mssg.format(img_path))
+            img_arr = _try_convert(img)
     elif len(img_arr.shape) == 2:
         img_arr = np.stack([img_arr] * 3, axis=2)
     else:
-        raise ValueError(err_mssg.format(img_path))
+        img = _try_convert(img)
     if save_resized_imgs and not resize_img_exists:
         if not os.path.exists(img_dir_new):
             os.makedirs(img_dir_new)
