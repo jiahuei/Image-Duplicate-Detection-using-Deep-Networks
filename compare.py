@@ -66,8 +66,7 @@ if __name__ == '__main__':
             dirs = [l.strip() for l in ff.readlines()]
     else:
         raise ValueError(
-            '`directory_file.txt` file missing. '
-            'It should contain the list of directories to scan.')
+            '`directory_file.txt` file missing. It should contain the list of directories to scan.')
     
     # Get CNN arguments
     short_side_len = args.short_side_len
