@@ -7,8 +7,8 @@ Created on Fri Nov 30 16:56:21 2018
 """
 import os, time, argparse, numpy as np
 import logging
-from ops import utils
 from tqdm import tqdm
+from ops import utils
 from ops.pretrained_cnn import get_cnn_default_input_size
 
 pjoin = os.path.join
