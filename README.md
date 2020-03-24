@@ -5,6 +5,12 @@ A simple Python 3 code for duplicate image detection, using deep CNNs as backbon
 2. Run `compare.py`.
 
 
+## References
+
+* [Keras Applications](https://github.com/keras-team/keras-applications/tree/976050c468ff949bcbd9b9cf64fe1d5c81db3f3a)
+* [TensorFlow Hub](https://www.tensorflow.org/hub/api_docs/python/hub)
+
+
 ## List of CNNs:
 
 For more details, refer to `ops/pretrained_cnn.py`.
